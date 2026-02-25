@@ -1,8 +1,23 @@
-# Customer Churn Prediction for ConnectTel
+# Customer Churn Prediction — End-to-End ML Pipeline
 
-## Project Overview
+## Business Problem
 
-ConnectTel is facing a significant challenge with customer churn, which impacts its revenue and growth. The aim of this project is to develop a robust customer churn prediction system using advanced analytics and machine learning techniques. By accurately forecasting which customers are likely to churn, ConnectTel can implement targeted retention strategies to reduce customer attrition, enhance loyalty, and maintain a competitive edge in the telecommunications industry.
+ConnectTel is facing a significant challenge with customer churn, which impacts its revenue and growth. The objective of this project is to develop an end-to-end machine learning (ML) system for predicting customer churn, combining exploratory analysis, feature engineering, class-imbalance-aware modeling, and threshold optimisation into a reproducible training pipeline. This robust customer churn prediction system uses advanced analytics and machine learning (ML) techniques to help identify customers at high risk of churn, understand key churn drivers, and provide actionable insights for retention strategy. By accurately forecasting which customers are likely to churn, ConnectTel can implement targeted retention strategies to reduce customer attrition, enhance loyalty, and maintain a competitive edge in the telecommunications industry.
+
+Customer Churn Prediction — End-to-End ML Pipeline
+
+An end-to-end ML system for predicting customer churn, combining exploratory analysis, feature engineering, class-imbalance-aware modeling, and threshold optimisation into a reproducible training pipeline.
+
+This project goes beyond “train a classifier.” It investigates why customers churn, builds features informed by domain insights, and packages the workflow into deployable artifacts.
+
+ConnectTel faces revenue loss due to customer churn.
+The objective is to:
+
+identify customers at high risk of churn, understand key churn drivers, and provide actionable insights for retention strategy
+
+Target variable: Churn
+Positive class = customers who left (1)
+
 
 ## Dataset
 
