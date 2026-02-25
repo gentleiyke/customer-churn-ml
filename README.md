@@ -2,43 +2,87 @@
 
 ## Business Problem
 
-ConnectTel is facing a significant challenge with customer churn, which impacts its revenue and growth. The objective of this project is to develop an end-to-end machine learning (ML) system for predicting customer churn, combining exploratory analysis, feature engineering, class-imbalance-aware modeling, and threshold optimisation into a reproducible training pipeline. This robust customer churn prediction system uses advanced analytics and machine learning (ML) techniques to help identify customers at high risk of churn, understand key churn drivers, and provide actionable insights for retention strategy. By accurately forecasting which customers are likely to churn, ConnectTel can implement targeted retention strategies to reduce customer attrition, enhance loyalty, and maintain a competitive edge in the telecommunications industry.
+ConnectTel is facing a significant challenge with customer churn, which impacts its revenue and growth. The objective of this project is to develop an end-to-end machine learning (ML) system for predicting customer churn, combining exploratory analysis, feature engineering, class-imbalance-aware modeling, and threshold optimisation into a reproducible training pipeline. This robust customer churn prediction system uses advanced analytics and machine learning (ML) techniques to help identify customers at high risk of churn, understand key churn drivers, and provide actionable insights for retention strategy. By accurately forecasting which customers are likely to churn, ConnectTel can implement targeted retention strategies to reduce customer attrition, enhance loyalty, and maintain a competitive edge in the telecommunications industry. This project goes beyond “train a classifier”. It investigates why customers churn, builds features informed by domain insights, and packages the workflow into deployable artifacts.
 
-Customer Churn Prediction — End-to-End ML Pipeline
+**Target variable:** Churn
+**Positive class = customers who left = 1**
 
-An end-to-end ML system for predicting customer churn, combining exploratory analysis, feature engineering, class-imbalance-aware modeling, and threshold optimisation into a reproducible training pipeline.
+## Dataset Overview
+The dataset contains 7,043 customers, 21 original features, and a mix of demographic, service, billing, and account variables. Key groups are:
+- **Demographics:** (gender, senior status, dependents)
+- **Service subscriptions:** (internet type, add-ons)
+- **Contract & billing:** (contract type, payment method, paperless billing)
+- **Charges:** (MonthlyCharges, TotalCharges)
+- **Tenure:** (months with company)
+- **Target variable:** (Churn) - ***Positive class = customers who left = 1***
 
-This project goes beyond “train a classifier.” It investigates why customers churn, builds features informed by domain insights, and packages the workflow into deployable artifacts.
+### Exploratory Data Analysis (EDA)
+The notebook (Customer_Churn_Analysis.ipynb) performs deep EDA before modeling.
+**Key Insights**
 
-ConnectTel faces revenue loss due to customer churn.
-The objective is to:
+**A. Class Imbalance**
 
-identify customers at high risk of churn, understand key churn drivers, and provide actionable insights for retention strategy
+- Majority class = non-churn
+Churn is minority and requires PR-based evaluation and threshold tuning.
 
-Target variable: Churn
-Positive class = customers who left (1)
+**B. Strong Drivers of Churn**
+
+**1. Contract Type**
+- Month-to-month contracts has the highest churn rate
+- Two-year contracts has the lowest churn rate
+- Longer contracts strongly reduce churn risk
+
+***Correlation with churn: -0.32***
+
+Tenure
+
+Short-tenure customers churn significantly more
+
+Longer tenure strongly reduces churn likelihood
+
+Correlation with churn: -0.35
+
+Internet Service
+
+Fiber optic customers show higher churn
+
+DSL churn moderate
+
+No-internet lowest churn
+
+Payment Method
+
+Electronic check → highest churn
+
+Bank transfer & credit card → lower churn
+
+Billing & Charges
+
+Higher MonthlyCharges → higher churn (correlation: 0.19)
+
+Paperless billing → associated with higher churn
+
+MonthlyCharges & TotalCharges strongly correlated (0.65)
+
+Demographics
+
+Senior citizens slightly more likely to churn
+
+Customers without partners or dependents churn more
+
+C. Engineered Features
+
+Based on EDA:
+
+TotalServices → count of subscribed services
+
+SeniorCitizenCat → categorical version for modeling consistency
+
+EDA insights inform modeling but no leakage occurs — all transformations are inside the sklearn pipeline.
 
 
-## Dataset
 
-The dataset consists of customer information, including demographic details, account information, service usage patterns, and churn status. The features include:
 
-- **Demographic Information:** Gender, SeniorCitizen, Partner, Dependents
-- **Account Information:** Tenure, Contract, PaperlessBilling, PaymentMethod, MonthlyCharges, TotalCharges
-- **Service Information:** PhoneService, MultipleLines, InternetService, OnlineSecurity, OnlineBackup, DeviceProtection, TechSupport, StreamingTV, StreamingMovies
-- **Churn Information:** Churn
-
-### Problem Definition
-- **Objective:** Develop a machine learning model to predict customer churn.
-- **Target Variable:** Churn (Yes/No)
-
-### Data Exploration and Preprocessing
-- **Load Libraries:** Import necessary libraries for data analysis, visualization, and machine learning.
-- **Data Loading:** Load the dataset and examine its structure.
-- **Data Cleaning:** Handle missing values and drop unnecessary columns.
-- **Exploratory Data Analysis (EDA):**
-  - Visualize relationships between the target variable and key features.
-  - Explore correlations and conduct univariate, bivariate, and multivariate analysis.
 
 ### Feature Engineering
 - **Encoding Categorical Variables:** Convert categorical variables into numerical format using Label Encoding and One-Hot Encoding.
