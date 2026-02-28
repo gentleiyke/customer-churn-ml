@@ -2,7 +2,11 @@
 
 ## Business Problem
 
-ConnectTel is facing a significant challenge with customer churn, which impacts its revenue and growth. The objective of this project is to develop an end-to-end machine learning (ML) system for predicting customer churn, combining exploratory analysis, feature engineering, class-imbalance-aware modeling, and threshold optimisation into a reproducible training pipeline. This robust customer churn prediction system uses advanced analytics and machine learning (ML) techniques to help identify customers at high risk of churn, understand key churn drivers, and provide actionable insights for retention strategy. By accurately forecasting which customers are likely to churn, ConnectTel can implement targeted retention strategies to reduce customer attrition, enhance loyalty, and maintain a competitive edge in the telecommunications industry. This project goes beyond “train a classifier”. It investigates why customers churn, builds features informed by domain insights, and packages the workflow into deployable artifacts.
+ConnectTel was facing a significant challenge with customer churn, which impacts its revenue and growth. The objective of this project is to develop an end-to-end machine learning (ML) system for predicting customer churn, combining exploratory analysis, feature engineering, class-imbalance-aware modeling, and threshold optimisation into a reproducible training pipeline. 
+
+This robust customer churn prediction system uses advanced analytics and machine learning (ML) techniques to help identify customers at high risk of churn, understand key churn drivers, and provide actionable insights for retention strategy. 
+
+By accurately forecasting which customers are likely to churn, ConnectTel can implement targeted retention strategies to reduce customer attrition, enhance loyalty, and maintain a competitive edge in the telecommunications industry. This project goes beyond “train a classifier”. It investigates why customers churn, builds features informed by domain insights, and packages the workflow into deployable artifacts.
 
 **Target variable:** Churn
 **Positive class = customers who left = 1**
@@ -23,111 +27,136 @@ The notebook (Customer_Churn_Analysis.ipynb) performs deep EDA before modeling.
 **A. Class Imbalance**
 
 - Majority class = non-churn
-Churn is minority and requires PR-based evaluation and threshold tuning.
+
+*Churn is minority and requires PR-based evaluation and threshold tuning.*
 
 **B. Strong Drivers of Churn**
 
 **1. Contract Type**
-- Month-to-month contracts has the highest churn rate
-- Two-year contracts has the lowest churn rate
-- Longer contracts strongly reduce churn risk
+- Month-to-month contract customers has the highest churn rate
+- Two-year contract customers has the lowest churn rate
 
-***Correlation with churn: -0.32***
+*Longer contracts strongly reduce churn risk (correlation with churn: -0.32)*
 
-Tenure
+**2. Tenure**
+- Short-tenure customers churn significantly more
+- Longer tenure strongly reduces churn likelihood
 
-Short-tenure customers churn significantly more
+*Correlation with churn: -0.35*
 
-Longer tenure strongly reduces churn likelihood
+**3. Internet Service**
+- Fiber optic customers show higher churn
+- Customers with DSL churn shown moderate churn
+- Customers with no internet show the lowest churn
 
-Correlation with churn: -0.35
+**4. Payment Method**
+- Electronic check customers show the highest churn
+- Bank transfer and credit card customers show lower churn
 
-Internet Service
+**5. Billing & Charges**
+- Customers with higher monthly charges show higher churn (*correlation: 0.19*)
+- Paperless billing customers are associated with higher churn
 
-Fiber optic customers show higher churn
+*Monthly Charges and Total Charges strongly correlated (0.65)*
 
-DSL churn moderate
+**6. Demographics**
+-  Customers who are senior citizens are slightly more likely to churn
+-  Customers without partners or dependents churn more
 
-No-internet lowest churn
+**C. Engineered Features (Based on EDA)**
+- TotalServices: count of subscribed services
+- SeniorCitizenCat: categorical version for modeling consistency
 
-Payment Method
+*EDA insights inform modelling, but no leakage occurs — all transformations are inside the sklearn pipeline.*
 
-Electronic check → highest churn
+### Modeling Strategy
+**A. Preprocessing:** implemented a leakage-safe pipeline using sklearn Pipeline for 
+- Numeric Variables: to scale varaiables and handle missing values using median imputation
+- Categorical Variables: to implement one-hot encoding and handle missing values using most frequent imputation
+- Combining pipelines using ColumnTransformer
 
-Bank transfer & credit card → lower churn
+**B. Candidate Models:** 
+- Logistic Regression
+- SVC
+- Histogram Gradient Boosting
 
-Billing & Charges
+**C. Model Selection Strategy** 
+- 5-fold cross-validation on training data
+- Compare models using ROC-AUC and PR-AUC
+- Select best model using validation PR-AUC
+- Optimise classification threshold using validation F1
+- Refit on train and validation
+- Final evaluation on unknown test set
 
-Higher MonthlyCharges → higher churn (correlation: 0.19)
+### Final Results (Test Set)
 
-Paperless billing → associated with higher churn
+Best model: Logistic Regression (balanced)
+Selected threshold: 0.61
 
-MonthlyCharges & TotalCharges strongly correlated (0.65)
+**Core Performance Metrics**
+| Metric    | Value |
+| --------- | ----- |
+| ROC-AUC   | 0.842 |
+| PR-AUC    | 0.633 |
+| Precision | 0.546 |
+| Recall    | 0.701 |
+| F1 Score  | 0.614 |
 
-Demographics
+**Confusion Matrix (Test Set)**
+|                | Predicted No Churn | Predicted Churn |
+| -------------- | ------------------ | --------------- |
+| **Actual No**  | 817                | 218             |
+| **Actual Yes** | 112                | 262             |
 
-Senior citizens slightly more likely to churn
+**Interpretation**
+- Threshold tuning improved recall while maintaining usable precision
+- Recall prioritised to catch churners
+- Balanced precision–recall tradeoff
 
-Customers without partners or dependents churn more
+### Repos Structure
+```
+artifacts/
+  ├── churn_model.joblib
+  ├── metrics.json
+  ├── schema.json
+  ├── cv_results.csv
+  ├── val_results.csv
+  ├── threshold_sweep.csv
+  └── pr_curve.csv
+data/ 
+  └── Customer-Churn.csv
+notebooks/ 
+  └── Customer_Churn_Analysis.ipynb
+src/
+  ├── config.py
+  ├── data.py
+  ├── pipeline.py
+  ├── evaluate.py
+  └── train.py
+README.md
+requirements.txt
+```
 
-C. Engineered Features
+**How to Run**
+```
+python train.py --data-path Customer-Churn.csv --artifact-dir artifacts
+```
 
-Based on EDA:
+Dependencies
 
-TotalServices → count of subscribed services
-
-SeniorCitizenCat → categorical version for modeling consistency
-
-EDA insights inform modeling but no leakage occurs — all transformations are inside the sklearn pipeline.
-
-
-
-
-
-### Feature Engineering
-- **Encoding Categorical Variables:** Convert categorical variables into numerical format using Label Encoding and One-Hot Encoding.
-- **Creating New Features:** Generate new features based on insights from EDA to enhance model performance.
-
-### Model Selection, Training, and Validation
-- **Train-Test Split:** Split the data into training and testing sets.
-- **Model Training:** Train three supervised learning models, including:
-  - Logistic Regression
-  - Gradient Boosting
-  - Support Vector Machine (SVM)
-- **Hyperparameter Tuning:** Use RandomizedSearchCV to optimise model hyperparameters.
-- **Model Evaluation:** Evaluate model performance using the following metrics precision, recall, F1-score and confusion matrix.
-
-### Model Evaluation
-- **Compare Models:** Analyse the results of the models and select the best-performing one based on evaluation metrics.
-- **Business Considerations:** Consider the impact of false positives and false negatives on the business to decide the best-suited model.
-
-**Model Interpretation and Insights**
-- Interpret the model results to derive actionable insights.
-- Identify the most significant features that influence customer churn.
-
-## Challenges Faced
-- Handling class imbalance in the dataset.
-- Feature engineering to improve model performance.
-- Selecting the most appropriate evaluation metrics for the business problem.
-
-## Conclusion
-
-ConnectTel can proactively address customer attrition and implement effective retention strategies by developing an accurate customer churn prediction model. This project demonstrates the application of data science and machine learning techniques to solve a critical business problem in the telecommunications industry.
-
-### Dependencies
-
-- Python 3.11
 - Pandas
 - NumPy
 - Matplotlib
 - Seaborn
 - Scikit-learn
 - Imbalanced-learn
+- Missingno
+- Joblib
 
 **Collaborations:**
 
 You can reach out to me using my contact below for gigs and collaborations.
 
-**Contact:**
+**PM:**
 
-ike@ikemefulaoriaku.space | (https://www.linkedin.com/in/gentleiyke/)
+ikemefulaoriaku@gmail.com | (https://www.linkedin.com/in/gentleiyke/)
